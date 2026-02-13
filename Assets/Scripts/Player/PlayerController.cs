@@ -25,9 +25,9 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private bool isGrounded;
     private int jumpCount;
+    public int facingDirection = 1; // 1 = derecha, -1 = izquierda
 
     public PlayerState currentState;
-
 
     void Awake()
     {
@@ -35,7 +35,6 @@ public class PlayerController : MonoBehaviour
         originalColliderSize = boxCollider.size;
         originalColliderOffset = boxCollider.offset;
         animator = GetComponent<Animator>();
-
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -47,15 +46,14 @@ public class PlayerController : MonoBehaviour
     public bool CanJump()
     {
         return currentState != PlayerState.Crawl &&
-            currentState != PlayerState.Dead;
+               currentState != PlayerState.Dead;
     }
 
     public bool CanShoot()
     {
         return currentState != PlayerState.Crawl &&
-            currentState != PlayerState.Dead;
+               currentState != PlayerState.Dead;
     }
-
 
     void Update()
     {
@@ -66,6 +64,9 @@ public class PlayerController : MonoBehaviour
     public void Move(float direction)
     {
         if (!CanMove()) return;
+
+        if (direction != 0)
+            facingDirection = direction > 0 ? 1 : -1;
 
         float speed = currentState == PlayerState.Crawl 
             ? moveSpeed * 0.5f 
@@ -82,10 +83,9 @@ public class PlayerController : MonoBehaviour
     }
 
 
-
     public void Jump()
     {
-        if (currentState == PlayerState.Crawl) return;
+        if (!CanJump()) return;
         if (jumpCount >= 2) return;
 
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
@@ -93,22 +93,19 @@ public class PlayerController : MonoBehaviour
         currentState = PlayerState.Jump;
     }
 
-
     void CheckGround()
     {
         isGrounded = Physics2D.OverlapCircle(
-            groundCheck.position, 
-            0.2f, 
+            groundCheck.position,
+            0.2f,
             groundLayer
         );
 
         if (isGrounded)
             jumpCount = 0;
-        if (isGrounded && currentState == PlayerState.Jump)
-        {
-            currentState = PlayerState.Idle;
-        }
 
+        if (isGrounded && currentState == PlayerState.Jump)
+            currentState = PlayerState.Idle;
     }
 
     void HandleState()
@@ -120,7 +117,6 @@ public class PlayerController : MonoBehaviour
 
         animator.SetFloat("verticalSpeed", rb.velocity.y);
     }
-
 
     public void StartCrawl()
     {
@@ -167,12 +163,19 @@ public class PlayerController : MonoBehaviour
         Handheld.Vibrate();
     #endif
 
-        Invoke(nameof(Restart), 0.4f);
+        Invoke(nameof(NotifyDeath), 0.4f);
     }
 
-    void Restart()
+    void NotifyDeath()
     {
-        GameManager.Instance.RestartLevel();
+        GameManager.Instance.PlayerDied(gameObject);
+    }
+
+
+    public void Respawn()
+    {
+        currentState = PlayerState.Idle;
+        rb.velocity = Vector2.zero;
     }
 
 }

@@ -1,21 +1,52 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class PlayerShooting : MonoBehaviour
 {
+    public PlayerController player;
     public GameObject bulletPrefab;
     public Transform firePoint;
-    public PlayerController player;
+    public float bulletSpeed = 10f;
 
-
-    public void Shoot(int direction)
+    public void Shoot()
     {
-        if (player.currentState == PlayerState.Crawl) return;
-        if (player.currentState == PlayerState.Dead) return;
+        if (player == null)
+        {
+            Debug.LogError("Player NO asignado en PlayerShooting");
+            return;
+        }
 
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-        bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(direction * 10f, 0);
+        if (bulletPrefab == null)
+        {
+            Debug.LogError("Bullet Prefab NO asignado");
+            return;
+        }
+
+        if (firePoint == null)
+        {
+            Debug.LogError("FirePoint NO asignado");
+            return;
+        }
+
+        int dir = player.facingDirection;
+
+        GameObject bullet = Instantiate(
+            bulletPrefab,
+            firePoint.position,
+            Quaternion.identity
+        );
+
+        Bullet b = bullet.GetComponent<Bullet>();
+        if (b == null)
+        {
+            Debug.LogError("El prefab de bala NO tiene script Bullet");
+            return;
+        }
+
+        b.Init(dir, bulletSpeed);
     }
 
+
 }
+

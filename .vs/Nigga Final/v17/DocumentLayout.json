@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\Tommy Gil\\Documents\\Tommy Segundo\\Proyecto 2D\\Nigga Final\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{AB47F9A3-D627-E40D-DD57-1BF6FC1760C0}|Assembly-CSharp.csproj|c:\\users\\tommy gil\\documents\\tommy segundo\\proyecto 2d\\nigga final\\assets\\scripts\\camera\\cameracontroller2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AB47F9A3-D627-E40D-DD57-1BF6FC1760C0}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\camera\\cameracontroller2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{AB47F9A3-D627-E40D-DD57-1BF6FC1760C0}|Assembly-CSharp.csproj|c:\\users\\tommy gil\\documents\\tommy segundo\\proyecto 2d\\nigga final\\assets\\scripts\\player\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{AB47F9A3-D627-E40D-DD57-1BF6FC1760C0}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\player\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -19,6 +23,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "CameraController2D.cs",
+              "DocumentMoniker": "C:\\Users\\Tommy Gil\\Documents\\Tommy Segundo\\Proyecto 2D\\Nigga Final\\Assets\\Scripts\\Camera\\CameraController2D.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Camera\\CameraController2D.cs",
+              "ToolTip": "C:\\Users\\Tommy Gil\\Documents\\Tommy Segundo\\Proyecto 2D\\Nigga Final\\Assets\\Scripts\\Camera\\CameraController2D.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Camera\\CameraController2D.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-10T14:17:45.723Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "PlayerController.cs",
               "DocumentMoniker": "C:\\Users\\Tommy Gil\\Documents\\Tommy Segundo\\Proyecto 2D\\Nigga Final\\Assets\\Scripts\\Player\\PlayerController.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\Player\\PlayerController.cs",
