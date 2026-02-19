@@ -13,6 +13,10 @@ public class PlayerController : MonoBehaviour
     public float crawlHeightMultiplier = 0.5f;
     public LayerMask ceilingLayer;
 
+    [Header("Climb")]
+    public float climbSpeed = 4f;
+    private bool isClimbing;
+
     private BoxCollider2D boxCollider;
     private Vector2 originalColliderSize;
     private Vector2 originalColliderOffset;
@@ -40,25 +44,39 @@ public class PlayerController : MonoBehaviour
 
     public bool CanMove()
     {
-        return currentState != PlayerState.Dead;
+        return currentState != PlayerState.Dead &&
+            currentState != PlayerState.Climb;
     }
 
     public bool CanJump()
     {
         return currentState != PlayerState.Crawl &&
-               currentState != PlayerState.Dead;
+            currentState != PlayerState.Dead &&
+            currentState != PlayerState.Climb;
     }
 
     public bool CanShoot()
     {
         return currentState != PlayerState.Crawl &&
-               currentState != PlayerState.Dead;
+            currentState != PlayerState.Dead &&
+            currentState != PlayerState.Climb;
     }
+
 
     void Update()
     {
         CheckGround();
         HandleState();
+        if (isClimbing)
+        {
+            // si el jugador salta, se sale de la escalera
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                StopClimbing();
+                Jump();
+            }
+        }
+
     }
 
     public void Move(float direction)
@@ -114,7 +132,7 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("isJumping", currentState == PlayerState.Jump);
         animator.SetBool("isCrawling", currentState == PlayerState.Crawl);
         animator.SetBool("isDead", currentState == PlayerState.Dead);
-
+        animator.SetBool("isClimbing", currentState == PlayerState.Climb);
         animator.SetFloat("verticalSpeed", rb.velocity.y);
     }
 
@@ -152,6 +170,39 @@ public class PlayerController : MonoBehaviour
         return !Physics2D.OverlapCircle(checkPosition, 0.2f, ceilingLayer);
     }
 
+    public void StartClimbing()
+    {
+        if (currentState == PlayerState.Dead) return;
+
+        currentState = PlayerState.Climb;
+        isClimbing = true;
+
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = 0f;
+    }
+
+    public void ClimbMove(float vertical)
+    {
+        if (!isClimbing) return;
+
+        rb.velocity = new Vector2(0f, vertical * climbSpeed);
+
+        if (vertical != 0)
+            currentState = PlayerState.Climb;
+    }
+
+
+    public void StopClimbing()
+    {
+        if (!isClimbing) return;
+
+        isClimbing = false;
+        rb.gravityScale = 3f; // o tu valor original
+        currentState = PlayerState.Idle;
+    }
+
+
+
     public void Die()
     {
         if (currentState == PlayerState.Dead) return;
@@ -165,6 +216,7 @@ public class PlayerController : MonoBehaviour
 
         Invoke(nameof(NotifyDeath), 0.4f);
     }
+    
 
     void NotifyDeath()
     {
