@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
     public int facingDirection = 1; // 1 = derecha, -1 = izquierda
 
     public PlayerState currentState;
+    private Vector3 originalScale;
 
     void Awake()
     {
@@ -40,6 +41,7 @@ public class PlayerController : MonoBehaviour
         originalColliderOffset = boxCollider.offset;
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        originalScale = transform.localScale;
     }
 
     public bool CanMove()
@@ -67,73 +69,79 @@ public class PlayerController : MonoBehaviour
     {
         CheckGround();
         HandleState();
-        if (isClimbing)
-        {
-            // si el jugador salta, se sale de la escalera
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                StopClimbing();
-                Jump();
-            }
-        }
 
+        float moveInput = Input.GetAxisRaw("Horizontal");
+        Move(moveInput);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            Jump();
+        Debug.Log(currentState);
+        Debug.Log(currentState + " | grounded: " + isGrounded + " | velX: " + rb.linearVelocity.x);
     }
 
     public void Move(float direction)
     {
         if (!CanMove()) return;
 
+        // Movimiento
+        rb.linearVelocity = new Vector2(direction * moveSpeed, rb.linearVelocity.y);
+
+        // Girar
         if (direction != 0)
+        {
             facingDirection = direction > 0 ? 1 : -1;
+            transform.localScale = new Vector3(
+                Mathf.Abs(transform.localScale.x) * facingDirection,
+                transform.localScale.y,
+                transform.localScale.z
+            );
+        }
 
-        float speed = currentState == PlayerState.Crawl 
-            ? moveSpeed * 0.5f 
-            : moveSpeed;
-
-        rb.velocity = new Vector2(direction * speed, rb.velocity.y);
-
-        if (!isGrounded) return;
-
-        if (direction != 0 && currentState != PlayerState.Crawl)
-            currentState = PlayerState.Run;
-        else if (currentState != PlayerState.Crawl)
-            currentState = PlayerState.Idle;
+        // Estado
+        if (Mathf.Abs(direction) > 0.01f)
+        {
+            if (isGrounded)
+                currentState = PlayerState.Run;
+        }
+        else
+        {
+            if (isGrounded)
+                currentState = PlayerState.Idle;
+        }
     }
-
 
     public void Jump()
     {
         if (!CanJump()) return;
         if (jumpCount >= 2) return;
 
-        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         jumpCount++;
         currentState = PlayerState.Jump;
     }
 
     void CheckGround()
     {
+        bool wasGrounded = isGrounded;
+
         isGrounded = Physics2D.OverlapCircle(
             groundCheck.position,
             0.2f,
             groundLayer
         );
 
-        if (isGrounded)
+        if (isGrounded && !wasGrounded)
+        {
             jumpCount = 0;
 
-        if (isGrounded && currentState == PlayerState.Jump)
-            currentState = PlayerState.Idle;
+            if (currentState == PlayerState.Jump)
+                currentState = PlayerState.Idle;
+        }
     }
 
     void HandleState()
     {
         animator.SetBool("isRunning", currentState == PlayerState.Run);
-        animator.SetBool("isJumping", currentState == PlayerState.Jump);
-        animator.SetBool("isCrawling", currentState == PlayerState.Crawl);
-        animator.SetBool("isDead", currentState == PlayerState.Dead);
-        animator.SetBool("isClimbing", currentState == PlayerState.Climb);
-        animator.SetFloat("verticalSpeed", rb.velocity.y);
     }
 
     public void StartCrawl()
@@ -177,7 +185,7 @@ public class PlayerController : MonoBehaviour
         currentState = PlayerState.Climb;
         isClimbing = true;
 
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
         rb.gravityScale = 0f;
     }
 
@@ -185,7 +193,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!isClimbing) return;
 
-        rb.velocity = new Vector2(0f, vertical * climbSpeed);
+        rb.linearVelocity = new Vector2(0f, vertical * climbSpeed);
 
         if (vertical != 0)
             currentState = PlayerState.Climb;
@@ -208,7 +216,7 @@ public class PlayerController : MonoBehaviour
         if (currentState == PlayerState.Dead) return;
 
         currentState = PlayerState.Dead;
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
 
     #if UNITY_ANDROID || UNITY_IOS
         Handheld.Vibrate();
@@ -227,7 +235,7 @@ public class PlayerController : MonoBehaviour
     public void Respawn()
     {
         currentState = PlayerState.Idle;
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
     }
 
 }

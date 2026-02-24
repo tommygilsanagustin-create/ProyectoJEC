@@ -1,25 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class MobileMoveButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    public float direction; // -1 izquierda, 1 derecha
-    private PlayerController player;
+    public PlayerController player;
+    public float direction;
 
-    void Start()
+    private bool pressed;
+
+    void Update()
     {
-        player = FindObjectOfType<PlayerController>();
+        if (pressed)
+            player.Move(direction);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        player.Move(direction);
+        pressed = true;
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        pressed = false;
         player.Move(0);
     }
 }
