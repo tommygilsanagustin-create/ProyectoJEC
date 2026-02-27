@@ -30,9 +30,10 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     private int jumpCount;
     public int facingDirection = 1; // 1 = derecha, -1 = izquierda
+    private float lastDirection = 1f;
+    private float moveInput;
 
     public PlayerState currentState;
-    private Vector3 originalScale;
 
     void Awake()
     {
@@ -41,9 +42,26 @@ public class PlayerController : MonoBehaviour
         originalColliderOffset = boxCollider.offset;
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
-        originalScale = transform.localScale;
     }
 
+    void Flip(float direction)
+    {
+        if (direction == 0) return;
+
+        lastDirection = direction;
+
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * (direction > 0 ? 1 : -1);
+        transform.localScale = scale;
+    }
+
+    public void SetMoveInput(float value)
+    {
+        moveInput = value;
+
+        if (value != 0)
+            Flip(value);
+    }
     public bool CanMove()
     {
         return currentState != PlayerState.Dead &&
@@ -70,45 +88,40 @@ public class PlayerController : MonoBehaviour
         CheckGround();
         HandleState();
 
-        float moveInput = Input.GetAxisRaw("Horizontal");
-        Move(moveInput);
+        if (isClimbing)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                StopClimbing();
+                Jump();
+            }
+            return;
+        }
 
-        if (Input.GetKeyDown(KeyCode.Space))
-            Jump();
-        Debug.Log(currentState);
-        Debug.Log(currentState + " | grounded: " + isGrounded + " | velX: " + rb.linearVelocity.x);
+        Move(moveInput);
     }
 
     public void Move(float direction)
     {
         if (!CanMove()) return;
 
-        // Movimiento
-        rb.linearVelocity = new Vector2(direction * moveSpeed, rb.linearVelocity.y);
-
-        // Girar
         if (direction != 0)
-        {
             facingDirection = direction > 0 ? 1 : -1;
-            transform.localScale = new Vector3(
-                Mathf.Abs(transform.localScale.x) * facingDirection,
-                transform.localScale.y,
-                transform.localScale.z
-            );
-        }
 
-        // Estado
-        if (Mathf.Abs(direction) > 0.01f)
-        {
-            if (isGrounded)
-                currentState = PlayerState.Run;
-        }
-        else
-        {
-            if (isGrounded)
-                currentState = PlayerState.Idle;
-        }
+        float speed = currentState == PlayerState.Crawl 
+            ? moveSpeed * 0.5f 
+            : moveSpeed;
+
+        rb.linearVelocity = new Vector2(direction * speed, rb.linearVelocity.y);
+
+        if (!isGrounded) return;
+
+        if (direction != 0 && currentState != PlayerState.Crawl)
+            currentState = PlayerState.Run;
+        else if (currentState != PlayerState.Crawl)
+            currentState = PlayerState.Idle;
     }
+
 
     public void Jump()
     {
@@ -122,21 +135,17 @@ public class PlayerController : MonoBehaviour
 
     void CheckGround()
     {
-        bool wasGrounded = isGrounded;
-
         isGrounded = Physics2D.OverlapCircle(
             groundCheck.position,
             0.2f,
             groundLayer
         );
 
-        if (isGrounded && !wasGrounded)
-        {
+        if (isGrounded)
             jumpCount = 0;
 
-            if (currentState == PlayerState.Jump)
-                currentState = PlayerState.Idle;
-        }
+        if (isGrounded && currentState == PlayerState.Jump)
+            currentState = PlayerState.Idle;
     }
 
     void HandleState()

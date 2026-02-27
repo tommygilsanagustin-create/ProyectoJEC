@@ -6,19 +6,42 @@ public class PlayerInputMobile : MonoBehaviour
 {
     public PlayerController player;
 
-    public void MoveLeft()
+    private float moveDirection = 0f;
+
+    void Update()
     {
-        player.Move(-1);
+        if (moveDirection != 0)
+        {
+            player.Move(moveDirection);
+        }
+        else
+        {
+            player.Move(0);
+        }
     }
 
-    public void MoveRight()
+    // BOTÓN IZQUIERDA
+    public void OnLeftDown()
     {
-        player.Move(1);
+        moveDirection = -1f;
     }
 
-    public void StopMove()
+    public void OnLeftUp()
     {
-        player.Move(0);
+        if (moveDirection < 0)
+            moveDirection = 0f;
+    }
+
+    // BOTÓN DERECHA
+    public void OnRightDown()
+    {
+        moveDirection = 1f;
+    }
+
+    public void OnRightUp()
+    {
+        if (moveDirection > 0)
+            moveDirection = 0f;
     }
 
     public void Jump()
