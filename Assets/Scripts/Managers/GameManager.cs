@@ -16,6 +16,21 @@ public class GameManager : MonoBehaviour
     [Header("Checkpoint")]
     private Vector3 checkpointPosition;
 
+    public bool hasKey = false;
+    public int collectibles = 0;
+    public int maxCollectibles = 4;
+
+    public void AddCollectible()
+    {
+        collectibles++;
+    }
+
+    public void PickKey()
+    {
+        hasKey = true;
+    }
+
+
     void Awake()
     {
         if (Instance == null)

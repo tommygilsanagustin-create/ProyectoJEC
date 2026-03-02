@@ -13,7 +13,7 @@ public class Bullet : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f; // ❌ nada de caer
-        rb.velocity = new Vector2(direction * speed, 0f);
+        rb.linearVelocity = new Vector2(direction * speed, 0f);
 
         startPos = transform.position;
     }

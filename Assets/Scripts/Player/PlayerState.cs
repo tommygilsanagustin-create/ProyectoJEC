@@ -8,5 +8,6 @@ public enum PlayerState
     Run,
     Jump,
     Crawl,
-    Dead
+    Dead,
+    Climb
 }
