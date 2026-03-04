@@ -49,13 +49,13 @@ public class PlayerInputMobile : MonoBehaviour
         player.Jump();
     }
 
-    public void CrawlDown()
+    public void CrouchDown()
     {
-        player.StartCrawl();
+        player.StartCrouch();
     }
 
-    public void CrawlUp()
+    public void CrouchUp()
     {
-        player.StopCrawl();
+        player.StopCrouch();
     }
 }

@@ -28,9 +28,21 @@ public class Bullet : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (!col.CompareTag("Player"))
+        if (col.CompareTag("Enemy"))
+        {
+            EnemyHealth enemy = col.GetComponent<EnemyHealth>();
+
+            if (enemy != null)
+            {
+                enemy.TakeDamage(1); // 👈 Quitamos 1 punto de vida
+            }
+
+            Destroy(gameObject);
+        }
+        else if (!col.CompareTag("Player"))
         {
             Destroy(gameObject);
         }
     }
+    
 }
