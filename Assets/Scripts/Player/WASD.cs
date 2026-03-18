@@ -44,11 +44,11 @@ public class WASD : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.S))
         {
-            player.StartCrawl();
+            player.StartCrouch();
         }
         else
         {
-            player.StopCrawl();
+            player.StopCrouch();
         }
     }
 }
